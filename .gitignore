@@ -1,0 +1,19 @@
+# Rust
+/target
+**/*.rs.bk
+
+# Local config and logs (the real ones live in %APPDATA%\Butaca, outside the repo)
+config.json
+*.log
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+
+# Instrucciones locales para Claude Code (no se suben al repo)
+CLAUDE.md
+
+# Generated at release time
+THIRD-PARTY-LICENSES.txt
