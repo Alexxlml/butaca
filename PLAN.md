@@ -44,7 +44,7 @@ Detente al final de cada fase para que Marco pruebe. Actualiza las casillas al t
 - [x] Selector de idioma en la ventana (vista previa; se aplica al guardar sin reiniciar)
 - [x] Test que exige las mismas claves y marcadores en todos los idiomas
 - [x] README en los 5 idiomas (`README.it.md` nuevo)
-- [ ] **Prueba de Marco**: cambiar de idioma y revisar cómo muestra Discord la línea de temporada/episodio en cada uno
+- [x] **Prueba de Marco**: cambiar de idioma y revisar cómo muestra Discord la línea de temporada/episodio en cada uno (24-oct-2026; en francés solo funciona `Saison 02, episode 01`)
 
 ## Fase 5 — Repo
 - [x] Identidad de git verificada: `noreply` de GitHub, solo en este repo
@@ -54,10 +54,16 @@ Detente al final de cada fase para que Marco pruebe. Actualiza las casillas al t
 - [x] `scripts/third_party_licenses.py` genera `THIRD-PARTY-LICENSES.txt` (se adjunta a cada Release)
 - [x] Workflow de Releases (`.github/workflows/release.yml`)
 - [x] `CLAUDE.md` se queda local (en `.gitignore`)
-- [ ] Revisión de Marco de los README antes de publicar
-- [ ] Primer commit, crear `Alexxlml/butaca` (público), push y topics (`kodi`, `discord`, `rich-presence`, `discord-rpc`, `coreelec`, `rust`, `windows`)
-- [ ] Tag `v0.1.0` y comprobar el Release
+- [x] Revisión de Marco de los README antes de publicar
+- [x] Primer commit, crear `Alexxlml/butaca` (público), push y topics (`kodi`, `discord`, `rich-presence`, `discord-rpc`, `coreelec`, `rust`, `windows`)
+- [x] Tag `v0.1.0` y comprobar el Release (publicado el 24-oct-2026: `.exe`, `.sha256` y `THIRD-PARTY-LICENSES.txt`; los tests pasaron en CI)
 
 ## WebSocket (entra en v0.1.0)
 - [x] WebSocket 9090 (`tungstenite`, `src/kodi_ws.rs`): señal inmediata al worker en `Player.OnPlay/OnPause/OnResume/OnStop/OnSeek/OnSpeedChanged`, con debounce de 400 ms; con el WebSocket abierto el polling baja a 15 s como respaldo. Opciones en `config.json`: `use_websocket` (true) y `websocket_port` (9090)
-- [ ] **Prueba de Marco** del WebSocket contra su Kodi real
+- [x] **Prueba de Marco** del WebSocket contra su Kodi real
+
+## Después de v0.1.0
+- [x] "Buscar actualizaciones…" en la bandeja (abre `releases/latest`) y versión en "Acerca de"
+- [x] README: tipos de medios compatibles (películas y episodios), actualizar y desinstalar
+- [ ] Botón que descargue y reemplace el exe (consultar `api.github.com/repos/Alexxlml/butaca/releases/latest`, verificar el `.sha256`, script auxiliar para reemplazar el exe en uso)
+- [ ] Subir `actions/checkout` de `@v4` a una versión con Node 24 (hoy solo avisa de que Node 20 está obsoleto)

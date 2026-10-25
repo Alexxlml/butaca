@@ -39,6 +39,15 @@ Es ist eine einzige kleine `.exe` (ohne Installer, ohne .NET oder andere Laufzei
 - Das Kodi-Passwort liegt in der **Windows-Anmeldeinformationsverwaltung**, nicht in einer Datei.
 - Keine Telemetrie, keine Konten, keine Werbung.
 
+## Unterstützte Medientypen
+
+| Medientyp | Was Discord anzeigt |
+|---|---|
+| Filme | Titel, Jahr und Regisseur, Genres, Poster, Fortschrittsbalken |
+| Serienepisoden | Serie, Episodentitel, Staffel und Episodennummer, Poster, Fortschrittsbalken |
+
+Andere Videodateien zeigen eine einfache Karte mit dem Titel.
+
 ## Installation
 
 Butaca benötigt **Windows 10 oder 11 (x64)** und die **Discord-Desktop-App** (nicht die Web-Version).

@@ -39,6 +39,15 @@ It is a single small `.exe` (no installer, no .NET or other runtime) that lives 
 - Your Kodi password is stored in the **Windows Credential Manager**, not in a file.
 - No telemetry, no accounts, no ads.
 
+## Supported media types
+
+| Media type | What Discord shows |
+|---|---|
+| Movies | Title, year and director, genres, poster, progress bar |
+| TV series episodes | Series, episode title, season and episode number, poster, progress bar |
+
+Other video files show a basic card with the title.
+
 ## Installation
 
 Butaca needs **Windows 10 or 11 (x64)** and the **Discord desktop app** (not the web version).

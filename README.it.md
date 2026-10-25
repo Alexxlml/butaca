@@ -39,6 +39,15 @@ Discord espone la sua interfaccia Rich Presence solo sul computer in cui è in e
 - La password di Kodi è salvata in **Gestione credenziali di Windows**, non in un file.
 - Nessuna telemetria, nessun account, nessuna pubblicità.
 
+## Tipi di contenuto supportati
+
+| Tipo di contenuto | Cosa mostra Discord |
+|---|---|
+| Film | Titolo, anno e regista, generi, locandina, barra di avanzamento |
+| Episodi di serie TV | Serie, titolo dell'episodio, stagione e numero di episodio, locandina, barra di avanzamento |
+
+Gli altri file video mostrano una scheda semplice con il titolo.
+
 ## Installazione
 
 Butaca richiede **Windows 10 o 11 (x64)** e l'**app desktop di Discord** (non la versione web).

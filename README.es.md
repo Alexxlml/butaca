@@ -39,6 +39,15 @@ Es un único `.exe` pequeño (sin instalador, sin .NET ni otro runtime) que vive
 - La contraseña de Kodi se guarda en el **Administrador de credenciales de Windows**, no en un archivo.
 - Sin telemetría, sin cuentas y sin anuncios.
 
+## Tipos de medios compatibles
+
+| Tipo de medio | Qué muestra Discord |
+|---|---|
+| Películas | Título, año y director, géneros, póster, barra de progreso |
+| Episodios de series | Serie, título del episodio, temporada y número de episodio, póster, barra de progreso |
+
+Otros archivos de video muestran una tarjeta básica con el título.
+
 ## Instalación
 
 Butaca necesita **Windows 10 u 11 (x64)** y la **aplicación de escritorio de Discord** (no la versión web).

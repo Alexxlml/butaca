@@ -39,6 +39,15 @@ C'est un seul petit `.exe` (sans installateur, sans .NET ni autre runtime) qui r
 - Le mot de passe de Kodi est stocké dans le **Gestionnaire d'informations d'identification de Windows**, pas dans un fichier.
 - Pas de télémétrie, pas de compte, pas de publicité.
 
+## Types de médias pris en charge
+
+| Type de média | Ce que Discord affiche |
+|---|---|
+| Films | Titre, année et réalisateur, genres, affiche, barre de progression |
+| Épisodes de séries | Série, titre de l'épisode, saison et numéro d'épisode, affiche, barre de progression |
+
+Les autres fichiers vidéo affichent une carte simple avec le titre.
+
 ## Installation
 
 Butaca nécessite **Windows 10 ou 11 (x64)** et l'**application de bureau Discord** (pas la version web).
