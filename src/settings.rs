@@ -463,8 +463,12 @@ unsafe fn on_test(st: &mut State, hwnd: HWND) {
     set_text(st.status, &t("settings.testing"));
     let h = hwnd as usize;
     let lang = i18n::current().to_string();
+    let ws_port = st.base.use_websocket.then_some(st.base.websocket_port).filter(|p| *p > 0);
     std::thread::spawn(move || {
-        let result = Kodi::new(&host, port, &user, &pass).ping().map_err(|e| friendly_error(&e, &lang));
+        let result = Kodi::new(&host, port, &user, &pass)
+            .ping()
+            .map(|version| (version, ws_port.map(|p| crate::kodi_ws::probe(&host, p).is_ok())))
+            .map_err(|e| friendly_error(&e, &lang));
         post(h, WM_TEST_DONE, result);
     });
 }
@@ -514,10 +518,18 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             0
         }
         WM_TEST_DONE => {
-            let r = Box::from_raw(lparam as *mut Result<String, String>);
+            let r = Box::from_raw(lparam as *mut Result<(String, Option<bool>), String>);
             EnableWindow(st.btn_test, 1);
             match *r {
-                Ok(v) => set_text(st.status, &tf("settings.test_ok", &[("version", &v)])),
+                Ok((v, ws)) => {
+                    let mut msg = tf("settings.test_ok", &[("version", &v)]);
+                    match ws {
+                        Some(true) => msg = format!("{msg}\r\n{}", t("settings.test_ws_ok")),
+                        Some(false) => msg = format!("{msg}\r\n{}", t("settings.test_ws_off")),
+                        None => {}
+                    }
+                    set_text(st.status, &msg);
+                }
                 Err(e) => set_text(st.status, &e),
             }
             0

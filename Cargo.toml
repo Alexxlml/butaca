@@ -21,6 +21,7 @@ tray-icon = "0.26.1"
 keyring = "4.2.0"
 mdns-sd = "0.21.6"
 winreg = "0.56.0"
+tungstenite = { version = "0.30.0", default-features = false, features = ["handshake"] }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.61.2", features = [

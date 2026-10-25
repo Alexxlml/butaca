@@ -27,6 +27,9 @@ pub struct Config {
     /// Idioma de la interfaz y del texto de la presencia ("en", "es", "fr", "de", "it").
     pub language: String,
     pub poll_seconds: u64,
+    /// Avisos de Kodi por WebSocket para reaccionar al instante; el polling queda de respaldo.
+    pub use_websocket: bool,
+    pub websocket_port: u16,
 }
 
 impl Default for Config {
@@ -41,6 +44,8 @@ impl Default for Config {
             show_idle_status: false,
             language: crate::i18n::DEFAULT.into(),
             poll_seconds: 3,
+            use_websocket: true,
+            websocket_port: 9090,
         }
     }
 }
@@ -121,6 +126,16 @@ pub fn load() -> Result<Loaded, String> {
         match write_password(&cfg.kodi_password).and_then(|()| save(&cfg)) {
             Ok(()) => log::info!("The Kodi password was moved to the Windows Credential Manager"),
             Err(e) => log::warn!("Could not move the password to the credential store ({e}); it stays in config.json"),
+        }
+    }
+    // Un archivo de una versión anterior no trae las opciones nuevas: se reescribe para que aparezcan.
+    let current = serde_json::to_value(&cfg).unwrap_or_default();
+    let stored: serde_json::Value = serde_json::from_str(&text).unwrap_or_default();
+    let missing = current.as_object().is_some_and(|c| stored.as_object().is_some_and(|o| c.keys().any(|k| !o.contains_key(k))));
+    if missing {
+        match write_file(&cfg) {
+            Ok(()) => log::info!("config.json updated with the new options"),
+            Err(e) => log::warn!("Could not update config.json: {e}"),
         }
     }
     Ok(Loaded::Ready(cfg))

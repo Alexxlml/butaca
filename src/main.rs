@@ -7,6 +7,7 @@ mod discord_ipc;
 mod discovery;
 mod i18n;
 mod kodi;
+mod kodi_ws;
 mod logger;
 mod presence;
 mod settings;

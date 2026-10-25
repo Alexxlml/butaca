@@ -59,6 +59,12 @@ fn message_box(title: &str, body: String) {
     });
 }
 
+const RELEASES_URL: &str = "https://github.com/Alexxlml/butaca/releases/latest";
+
+fn open_releases() {
+    let _ = std::process::Command::new("explorer").arg(RELEASES_URL).spawn();
+}
+
 fn open_logs() {
     let _ = std::process::Command::new("explorer").arg(config::config_dir()).spawn();
 }
@@ -124,6 +130,7 @@ pub fn run(instance: Instance) {
     let settings_item = MenuItem::new(i18n::t("tray.settings"), true, None);
     let pause_item = MenuItem::new(i18n::t("tray.pause"), cfg.is_some(), None);
     let logs_item = MenuItem::new(i18n::t("tray.open_logs"), true, None);
+    let updates_item = MenuItem::new(i18n::t("tray.updates"), true, None);
     let about_item = MenuItem::new(i18n::t("tray.about"), true, None);
     let quit_item = MenuItem::new(i18n::t("tray.quit"), true, None);
     let menu = Menu::new();
@@ -133,6 +140,7 @@ pub fn run(instance: Instance) {
         &settings_item,
         &pause_item,
         &logs_item,
+        &updates_item,
         &about_item,
         &PredefinedMenuItem::separator(),
         &quit_item,
@@ -179,6 +187,7 @@ pub fn run(instance: Instance) {
             settings_item.set_text(i18n::t("tray.settings"));
             pause_item.set_text(i18n::t(if paused { "tray.resume" } else { "tray.pause" }));
             logs_item.set_text(i18n::t("tray.open_logs"));
+            updates_item.set_text(i18n::t("tray.updates"));
             about_item.set_text(i18n::t("tray.about"));
             quit_item.set_text(i18n::t("tray.quit"));
             if let Some(tray) = tray {
@@ -233,8 +242,14 @@ pub fn run(instance: Instance) {
                     }
                 } else if e.id == *logs_item.id() {
                     open_logs();
+                } else if e.id == *updates_item.id() {
+                    open_releases();
                 } else if e.id == *about_item.id() {
-                    message_box(APP, format!("{}\n\n{LEGAL}", i18n::t("tray.about_body")));
+                    message_box(APP, format!(
+                            "{}\n{}\n\n{LEGAL}",
+                            i18n::t("tray.about_body"),
+                            i18n::tf("tray.about_version", &[("version", env!("CARGO_PKG_VERSION"))])
+                        ));
                 } else if e.id == *quit_item.id() {
                     // Limpia la actividad antes de salir y quita el ícono de la bandeja.
                     if let Some(w) = worker.take() {

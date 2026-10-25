@@ -58,5 +58,6 @@ Detente al final de cada fase para que Marco pruebe. Actualiza las casillas al t
 - [ ] Primer commit, crear `Alexxlml/butaca` (público), push y topics (`kodi`, `discord`, `rich-presence`, `discord-rpc`, `coreelec`, `rust`, `windows`)
 - [ ] Tag `v0.1.0` y comprobar el Release
 
-## Pendiente para v0.2.0
-- [ ] WebSocket 9090 (`tungstenite`): señal inmediata al worker en `Player.OnPlay/OnPause/OnResume/OnStop/OnSeek`, con debounce y el polling como respaldo
+## WebSocket (entra en v0.1.0)
+- [x] WebSocket 9090 (`tungstenite`, `src/kodi_ws.rs`): señal inmediata al worker en `Player.OnPlay/OnPause/OnResume/OnStop/OnSeek/OnSpeedChanged`, con debounce de 400 ms; con el WebSocket abierto el polling baja a 15 s como respaldo. Opciones en `config.json`: `use_websocket` (true) y `websocket_port` (9090)
+- [ ] **Prueba de Marco** del WebSocket contra su Kodi real

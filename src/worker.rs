@@ -3,12 +3,13 @@
 use crate::config::Config;
 use crate::discord_ipc::DiscordIpc;
 use crate::kodi::Kodi;
+use crate::kodi_ws::KodiWs;
 use crate::presence;
 use crate::tmdb::Tmdb;
 use serde_json::Value;
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender};
 use std::thread::JoinHandle;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 #[derive(Clone, PartialEq, Debug)]
 pub enum Status {
@@ -26,6 +27,8 @@ pub enum Cmd {
     /// Nueva configuración: se aplica sin cerrar la conexión con Discord
     /// (Discord tarda en aceptar una conexión que se reabre al instante).
     Config(Box<Config>),
+    /// Kodi avisó por WebSocket de un cambio en la reproducción: consultar ya.
+    Wake,
     Quit,
 }
 
@@ -37,7 +40,8 @@ pub struct Worker {
 impl Worker {
     pub fn spawn(cfg: Config, report: impl Fn(Status) + Send + 'static) -> Self {
         let (tx, rx) = mpsc::channel();
-        let handle = std::thread::spawn(move || run(cfg, rx, report));
+        let wake = tx.clone();
+        let handle = std::thread::spawn(move || run(cfg, rx, wake, report));
         Self { tx, handle }
     }
 
@@ -69,11 +73,54 @@ fn wait(rx: &Receiver<Cmd>, d: Duration, paused: &mut bool, pending: &mut Option
             *pending = Some(*c);
             false
         }
+        Ok(Cmd::Wake) => {
+            // Debounce: Kodi suele mandar varios eventos seguidos y el item tarda un instante en estar listo.
+            loop {
+                match rx.recv_timeout(Duration::from_millis(400)) {
+                    Ok(Cmd::Wake) => {}
+                    Ok(Cmd::SetPaused(p)) => *paused = p,
+                    Ok(Cmd::Config(c)) => *pending = Some(*c),
+                    Ok(Cmd::Quit) | Err(RecvTimeoutError::Disconnected) => return true,
+                    Err(RecvTimeoutError::Timeout) => return false,
+                }
+            }
+        }
         Err(RecvTimeoutError::Timeout) => false,
     }
 }
 
-fn run(mut cfg: Config, rx: Receiver<Cmd>, report: impl Fn(Status)) {
+/// Como `wait`, pero ignora los avisos del WebSocket: con Discord cerrado no hay nada que adelantar.
+fn wait_full(rx: &Receiver<Cmd>, d: Duration, paused: &mut bool, pending: &mut Option<Config>) -> bool {
+    let end = Instant::now() + d;
+    loop {
+        let Some(left) = end.checked_duration_since(Instant::now()).filter(|l| !l.is_zero()) else {
+            return false;
+        };
+        match rx.recv_timeout(left) {
+            Ok(Cmd::Wake) => {}
+            Ok(Cmd::SetPaused(p)) => {
+                *paused = p;
+                return false;
+            }
+            Ok(Cmd::Config(c)) => {
+                *pending = Some(*c);
+                return false;
+            }
+            Ok(Cmd::Quit) | Err(RecvTimeoutError::Disconnected) => return true,
+            Err(RecvTimeoutError::Timeout) => return false,
+        }
+    }
+}
+
+fn start_ws(cfg: &Config, wake: &Sender<Cmd>) -> Option<KodiWs> {
+    (cfg.use_websocket && cfg.websocket_port != 0)
+        .then(|| KodiWs::spawn(cfg.kodi_host.trim().to_string(), cfg.websocket_port, wake.clone()))
+}
+
+/// Con el WebSocket activo el polling solo es respaldo.
+const BACKUP_POLL: Duration = Duration::from_secs(15);
+
+fn run(mut cfg: Config, rx: Receiver<Cmd>, wake: Sender<Cmd>, report: impl Fn(Status)) {
     let mut kodi = Kodi::new(cfg.kodi_host.trim(), cfg.kodi_port, &cfg.kodi_user, &cfg.kodi_password);
     let mut tmdb = Tmdb::new(&cfg.tmdb_api_key);
     let mut discord = DiscordIpc::new(&cfg.discord_client_id);
@@ -87,6 +134,7 @@ fn run(mut cfg: Config, rx: Receiver<Cmd>, report: impl Fn(Status)) {
     let mut poll = Duration::from_secs(cfg.poll_seconds.max(1));
     let mut lang = crate::i18n::normalize(&cfg.language);
     let mut pending: Option<Config> = None;
+    let mut ws = start_ws(&cfg, &wake);
     let retry = Duration::from_secs(10);
 
     let mut shown: Option<Status> = None;
@@ -109,6 +157,7 @@ fn run(mut cfg: Config, rx: Receiver<Cmd>, report: impl Fn(Status)) {
             tmdb = Tmdb::new(&new.tmdb_api_key);
             poll = Duration::from_secs(new.poll_seconds.max(1));
             lang = crate::i18n::normalize(&new.language);
+            ws = start_ws(&new, &wake);
             kodi_ok = None;
             last = None; // se vuelve a publicar con el idioma y los datos nuevos
             log::info!("Settings applied: Kodi {}:{} (language: {lang})", new.kodi_host.trim(), new.kodi_port);
@@ -151,7 +200,7 @@ fn run(mut cfg: Config, rx: Receiver<Cmd>, report: impl Fn(Status)) {
                         discord_down_logged = true;
                     }
                     set_status(Status::DiscordClosed);
-                    if wait(&rx, retry, &mut paused, &mut pending) {
+                    if wait_full(&rx, retry, &mut paused, &mut pending) {
                         break;
                     }
                     continue;
@@ -214,7 +263,7 @@ fn run(mut cfg: Config, rx: Receiver<Cmd>, report: impl Fn(Status)) {
                     discord.close();
                     connected = false;
                     set_status(Status::DiscordClosed);
-                    if wait(&rx, retry, &mut paused, &mut pending) {
+                    if wait_full(&rx, retry, &mut paused, &mut pending) {
                         break;
                     }
                     continue;
@@ -230,7 +279,11 @@ fn run(mut cfg: Config, rx: Receiver<Cmd>, report: impl Fn(Status)) {
             _ => Status::WaitingKodi,
         });
 
-        if wait(&rx, poll, &mut paused, &mut pending) {
+        let next = match &ws {
+            Some(w) if w.is_connected() => poll.max(BACKUP_POLL),
+            _ => poll,
+        };
+        if wait(&rx, next, &mut paused, &mut pending) {
             break;
         }
     }
