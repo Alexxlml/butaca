@@ -66,4 +66,4 @@ Detente al final de cada fase para que Marco pruebe. Actualiza las casillas al t
 - [x] "Buscar actualizaciones…" en la bandeja (abre `releases/latest`) y versión en "Acerca de"
 - [x] README: tipos de medios compatibles (películas y episodios), actualizar y desinstalar
 - [ ] Botón que descargue y reemplace el exe (consultar `api.github.com/repos/Alexxlml/butaca/releases/latest`, verificar el `.sha256`, script auxiliar para reemplazar el exe en uso)
-- [ ] Subir `actions/checkout` de `@v4` a una versión con Node 24 (hoy solo avisa de que Node 20 está obsoleto)
+- [x] `actions/checkout@v7` y ejecución manual del workflow (Actions → Release → Run workflow) para probar tests, build y empaquetado sin publicar; deja el resultado como artefacto de 3 días
