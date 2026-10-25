@@ -32,6 +32,7 @@ It is a single small `.exe` (no installer, no .NET or other runtime) that lives 
 - Works with any Kodi reachable from your PC; no Kodi add-on needed.
 - Movie, TV episode and "other video" cards, with poster, progress bar and pause state.
 - **Find Kodi on the network** (mDNS/Zeroconf) and **Test connection** buttons.
+- **Instant updates:** Butaca listens to Kodi's notifications (WebSocket, port 9090), so play, pause and seek show up on Discord right away. If that port is not available, it falls back to checking every few seconds.
 - Optional [TMDb](https://www.themoviedb.org/) key for posters, release year and directors when Kodi does not have them.
 - Interface and Discord text in 5 languages: English, Español, Français, Deutsch and Italiano.
 - Starts with Windows (optional), single instance, rotating log, applies settings without restarting.
@@ -64,10 +65,12 @@ Then, in Butaca's settings, type your Kodi's IP address (or press **Find Kodi on
 
 Butaca never changes Kodi's settings. It was tested with Kodi 22 on CoreELEC.
 
+The instant updates use Kodi's WebSocket on port `9090`, which is enabled together with remote control from other systems. **Test connection** tells you whether it is available; if it is not, Butaca keeps working by polling. To turn it off or change the port, edit `use_websocket` and `websocket_port` in `config.json`.
+
 ## Using Butaca
 
 - Butaca runs in the **system tray**. Double-click the icon to open the settings.
-- Right-click the icon for the menu: status, Settings…, Pause/Resume presence, Open log folder, About, Exit.
+- Right-click the icon for the menu: status, Settings…, Pause/Resume presence, Open log folder, Check for updates…, About (shows the installed version), Exit.
 - When you exit, your Discord status is cleared.
 - Opening Butaca a second time just brings up the settings of the running one.
 
@@ -83,6 +86,12 @@ Butaca never changes Kodi's settings. It was tested with Kodi 22 on CoreELEC.
 
 Files live in `%APPDATA%\Butaca\`: `config.json` (no password inside) and `butaca.log` (rotated, 1 MB × 3).
 
+## Updating and uninstalling
+
+**Update:** tray menu → *Check for updates…* opens the latest release page. Download the new `.exe`, exit Butaca (tray menu → Exit) and replace the old file. Your settings are kept. Compare the version shown in *About* with the one on the Releases page.
+
+**Uninstall:** untick *Start with Windows* in the settings, exit Butaca and delete the `.exe`. To remove every trace, also delete the `%APPDATA%\Butaca\` folder and, if you saved a Kodi password, the `kodi-password.Butaca` entry in Windows *Credential Manager*.
+
 ## How the poster is chosen
 
 1. The artwork Kodi already has, when it is a public `https` URL.
@@ -93,7 +102,7 @@ Local paths and `smb://` artwork cannot be shown by Discord, so they are skipped
 
 ## Privacy and security
 
-- Butaca talks to: your Kodi (HTTP on your local network), Discord (local IPC on your PC) and, **only if you set a key**, TMDb.
+- Butaca talks to: your Kodi (HTTP and WebSocket on your local network), Discord (local IPC on your PC) and, **only if you set a key**, TMDb.
 - What you are watching is published to your Discord profile, as Rich Presence does by design. Use *Pause presence* in the tray menu to stop it.
 - The Kodi password is stored in the Windows Credential Manager. The TMDb key is saved in `config.json` as plain text; it is a free key tied to your own account.
 - Kodi's HTTP login travels unencrypted on your network. Keep Kodi's remote control inside your home network and never expose it to the internet.
@@ -125,7 +134,7 @@ The executable is `target\release\butaca.exe`. Run `cargo test` for the unit tes
 
 ## Roadmap
 
-- Instant updates through Kodi's WebSocket notifications (port 9090), keeping polling as a fallback.
+- Download and install updates from within the app.
 
 ## Legal
 

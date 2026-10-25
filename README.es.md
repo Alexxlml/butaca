@@ -32,6 +32,7 @@ Es un único `.exe` pequeño (sin instalador, sin .NET ni otro runtime) que vive
 - Funciona con cualquier Kodi al que llegue tu PC; no necesita ningún addon de Kodi.
 - Tarjetas de película, episodio y "otro video", con póster, barra de progreso y estado de pausa.
 - Botones **Buscar Kodi en la red** (mDNS/Zeroconf) y **Probar conexión**.
+- **Actualización instantánea:** Butaca escucha las notificaciones de Kodi (WebSocket, puerto 9090), así que reproducir, pausar o avanzar se refleja en Discord al instante. Si ese puerto no está disponible, revisa cada pocos segundos.
 - Clave opcional de [TMDb](https://www.themoviedb.org/) para póster, año y directores cuando Kodi no los tiene.
 - Interfaz y texto de Discord en 5 idiomas: English, Español, Français, Deutsch e Italiano.
 - Inicio con Windows (opcional), instancia única, log con rotación y cambios de configuración sin reiniciar.
@@ -64,10 +65,12 @@ Después, en la configuración de Butaca escribe la IP de tu Kodi (o pulsa **Bus
 
 Butaca nunca cambia los ajustes de Kodi. Se probó con Kodi 22 en CoreELEC.
 
+La actualización instantánea usa el WebSocket de Kodi en el puerto `9090`, que se activa junto con el control remoto desde otros sistemas. **Probar conexión** te dice si está disponible; si no lo está, Butaca sigue funcionando con sondeo. Para desactivarlo o cambiar el puerto, edita `use_websocket` y `websocket_port` en `config.json`.
+
 ## Uso
 
 - Butaca corre en la **bandeja del sistema**. Haz doble clic en el ícono para abrir la configuración.
-- Clic derecho en el ícono para el menú: estado, Configuración…, Pausar/Reanudar presencia, Abrir carpeta de logs, Acerca de y Salir.
+- Clic derecho en el ícono para el menú: estado, Configuración…, Pausar/Reanudar presencia, Abrir carpeta de logs, Buscar actualizaciones…, Acerca de (muestra la versión instalada) y Salir.
 - Al salir, se limpia tu estado de Discord.
 - Si abres Butaca por segunda vez, solo muestra la configuración de la que ya está corriendo.
 
@@ -83,6 +86,12 @@ Butaca nunca cambia los ajustes de Kodi. Se probó con Kodi 22 en CoreELEC.
 
 Los archivos están en `%APPDATA%\Butaca\`: `config.json` (sin la contraseña) y `butaca.log` (con rotación, 1 MB × 3).
 
+## Actualizar y desinstalar
+
+**Actualizar:** menú de la bandeja → *Buscar actualizaciones…* abre la página de la última versión. Descarga el nuevo `.exe`, cierra Butaca (menú de la bandeja → Salir) y reemplaza el archivo anterior. Tu configuración se conserva. Compara la versión que muestra *Acerca de* con la de la página de Releases.
+
+**Desinstalar:** desmarca *Iniciar con Windows* en la configuración, cierra Butaca y borra el `.exe`. Para no dejar rastro, borra también la carpeta `%APPDATA%\Butaca\` y, si guardaste una contraseña de Kodi, la entrada `kodi-password.Butaca` en el *Administrador de credenciales* de Windows.
+
 ## Cómo se elige el póster
 
 1. El arte que Kodi ya tiene, si es una URL `https` pública.
@@ -93,7 +102,7 @@ Discord no puede mostrar rutas locales ni arte `smb://`, así que se omiten. Las
 
 ## Privacidad y seguridad
 
-- Butaca se comunica con: tu Kodi (HTTP en tu red local), Discord (IPC local en tu PC) y, **solo si pones una clave**, con TMDb.
+- Butaca se comunica con: tu Kodi (HTTP y WebSocket en tu red local), Discord (IPC local en tu PC) y, **solo si pones una clave**, con TMDb.
 - Lo que ves se publica en tu perfil de Discord, como hace Rich Presence por diseño. Usa *Pausar presencia* en el menú de la bandeja para detenerlo.
 - La contraseña de Kodi va en el Administrador de credenciales de Windows. La clave de TMDb se guarda en `config.json` en texto plano; es una clave gratuita ligada a tu propia cuenta.
 - El inicio de sesión HTTP de Kodi viaja sin cifrar por tu red. Mantén el control remoto de Kodi dentro de tu red doméstica y nunca lo expongas a internet.
@@ -125,7 +134,7 @@ El ejecutable queda en `target\release\butaca.exe`. Con `cargo test` corres las 
 
 ## Próximamente
 
-- Actualizaciones instantáneas con las notificaciones WebSocket de Kodi (puerto 9090), conservando el polling como respaldo.
+- Descargar e instalar las actualizaciones desde la propia app.
 
 ## Legal
 

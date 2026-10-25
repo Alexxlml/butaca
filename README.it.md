@@ -32,6 +32,7 @@ Discord espone la sua interfaccia Rich Presence solo sul computer in cui è in e
 - Funziona con qualsiasi Kodi raggiungibile dal tuo PC; non serve nessun add-on di Kodi.
 - Schede per film, episodi e «altri video», con locandina, barra di avanzamento e stato di pausa.
 - Pulsanti **Cerca Kodi nella rete** (mDNS/Zeroconf) e **Testa connessione**.
+- **Aggiornamento istantaneo:** Butaca ascolta le notifiche di Kodi (WebSocket, porta 9090), così riproduzione, pausa e spostamenti compaiono subito su Discord. Se la porta non è disponibile, controlla ogni pochi secondi.
 - Chiave [TMDb](https://www.themoviedb.org/) facoltativa per locandina, anno e registi quando Kodi non li ha.
 - Interfaccia e testo della presenza in 5 lingue (inglese, spagnolo, francese, tedesco, italiano).
 - Avvio con Windows (facoltativo), istanza unica, log con rotazione, impostazioni applicate senza riavviare.
@@ -64,10 +65,12 @@ Poi, nelle impostazioni di Butaca, scrivi l'indirizzo IP del tuo Kodi (oppure pr
 
 Butaca non modifica mai le impostazioni di Kodi. È stato provato con Kodi 22 su CoreELEC.
 
+L'aggiornamento istantaneo usa il WebSocket di Kodi sulla porta `9090`, che si attiva insieme al controllo remoto da altri sistemi. **Testa connessione** indica se è disponibile; in caso contrario, Butaca continua a funzionare con il polling. Per disattivarlo o cambiare la porta, modifica `use_websocket` e `websocket_port` in `config.json`.
+
 ## Uso
 
 - Butaca gira nell'**area di notifica**. Fai doppio clic sull'icona per aprire le impostazioni.
-- Clic destro sull'icona per il menu: stato, Impostazioni…, Metti in pausa / Riprendi la presenza, Apri la cartella dei log, Informazioni, Esci.
+- Clic destro sull'icona per il menu: stato, Impostazioni…, Metti in pausa / Riprendi la presenza, Apri la cartella dei log, Cerca aggiornamenti…, Informazioni (mostra la versione installata), Esci.
 - All'uscita il tuo stato Discord viene cancellato.
 - Se apri Butaca una seconda volta, si apre soltanto la finestra delle impostazioni di quella già in esecuzione.
 
@@ -83,6 +86,12 @@ Butaca non modifica mai le impostazioni di Kodi. È stato provato con Kodi 22 su
 
 I file si trovano in `%APPDATA%\Butaca\`: `config.json` (senza la password) e `butaca.log` (con rotazione, 1 MB × 3).
 
+## Aggiornare e disinstallare
+
+**Aggiornare:** menu dell'area di notifica → *Cerca aggiornamenti…* apre la pagina dell'ultima versione. Scarica il nuovo `.exe`, chiudi Butaca (menu → Esci) e sostituisci il vecchio file. Le tue impostazioni vengono conservate. Confronta la versione mostrata in *Informazioni* con quella della pagina delle Releases.
+
+**Disinstallare:** deseleziona *Avvia con Windows* nelle impostazioni, chiudi Butaca ed elimina l'`.exe`. Per non lasciare tracce, elimina anche la cartella `%APPDATA%\Butaca\` e, se hai salvato una password di Kodi, la voce `kodi-password.Butaca` in *Gestione credenziali* di Windows.
+
 ## Come viene scelta la locandina
 
 1. L'immagine che Kodi ha già, se è un URL `https` pubblico.
@@ -93,7 +102,7 @@ Discord non può mostrare percorsi locali né immagini `smb://`, quindi vengono 
 
 ## Privacy e sicurezza
 
-- Butaca comunica con: il tuo Kodi (HTTP sulla rete locale), Discord (IPC locale sul tuo PC) e, **solo se imposti una chiave**, TMDb.
+- Butaca comunica con: il tuo Kodi (HTTP e WebSocket sulla rete locale), Discord (IPC locale sul tuo PC) e, **solo se imposti una chiave**, TMDb.
 - Ciò che guardi viene pubblicato sul tuo profilo Discord, come prevede Rich Presence. Usa *Metti in pausa la presenza* nel menu dell'area di notifica per fermarlo.
 - La password di Kodi è in Gestione credenziali di Windows. La chiave di TMDb è salvata in `config.json` in chiaro; è una chiave gratuita legata al tuo account.
 - Il login HTTP di Kodi viaggia non cifrato sulla tua rete. Tieni il controllo remoto di Kodi nella rete domestica e non esporlo mai su Internet.
@@ -125,7 +134,7 @@ L'eseguibile è `target\release\butaca.exe`. Con `cargo test` si eseguono i test
 
 ## Prossimamente
 
-- Aggiornamenti istantanei tramite le notifiche WebSocket di Kodi (porta 9090), con il polling come ripiego.
+- Scaricare e installare gli aggiornamenti dall'app stessa.
 
 ## Note legali
 

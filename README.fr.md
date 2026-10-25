@@ -32,6 +32,7 @@ C'est un seul petit `.exe` (sans installateur, sans .NET ni autre runtime) qui r
 - Fonctionne avec n'importe quel Kodi accessible depuis votre PC ; aucun module complémentaire Kodi n'est nécessaire.
 - Cartes pour les films, les épisodes et les « autres vidéos », avec affiche, barre de progression et état de pause.
 - Boutons **Trouver Kodi sur le réseau** (mDNS/Zeroconf) et **Tester la connexion**.
+- **Mise à jour instantanée :** Butaca écoute les notifications de Kodi (WebSocket, port 9090) : lecture, pause et déplacement dans la vidéo apparaissent aussitôt sur Discord. Si ce port n'est pas disponible, il interroge Kodi toutes les quelques secondes.
 - Clé [TMDb](https://www.themoviedb.org/) facultative pour l'affiche, l'année et les réalisateurs lorsque Kodi ne les a pas.
 - Interface et texte Discord en 5 langues : English, Español, Français, Deutsch et Italiano.
 - Démarrage avec Windows (facultatif), instance unique, journal avec rotation, paramètres appliqués sans redémarrer.
@@ -64,10 +65,12 @@ Ensuite, dans les paramètres de Butaca, saisissez l'adresse IP de votre Kodi (o
 
 Butaca ne modifie jamais les paramètres de Kodi. Il a été testé avec Kodi 22 sur CoreELEC.
 
+La mise à jour instantanée utilise le WebSocket de Kodi sur le port `9090`, activé en même temps que le contrôle à distance depuis d'autres systèmes. **Tester la connexion** indique s'il est disponible ; sinon, Butaca continue de fonctionner par sondage. Pour le désactiver ou changer le port, modifiez `use_websocket` et `websocket_port` dans `config.json`.
+
 ## Utilisation
 
 - Butaca s'exécute dans la **zone de notification**. Double-cliquez sur l'icône pour ouvrir les paramètres.
-- Clic droit sur l'icône pour le menu : état, Paramètres…, Mettre la présence en pause / Reprendre la présence, Ouvrir le dossier des journaux, À propos, Quitter.
+- Clic droit sur l'icône pour le menu : état, Paramètres…, Mettre la présence en pause / Reprendre la présence, Ouvrir le dossier des journaux, Rechercher des mises à jour…, À propos (affiche la version installée), Quitter.
 - À la fermeture, votre statut Discord est effacé.
 - Si vous lancez Butaca une deuxième fois, cela ouvre simplement les paramètres de l'instance déjà active.
 
@@ -83,6 +86,12 @@ Butaca ne modifie jamais les paramètres de Kodi. Il a été testé avec Kodi 22
 
 Les fichiers se trouvent dans `%APPDATA%\Butaca\` : `config.json` (sans le mot de passe) et `butaca.log` (avec rotation, 1 Mo × 3).
 
+## Mettre à jour et désinstaller
+
+**Mettre à jour :** menu de la zone de notification → *Rechercher des mises à jour…* ouvre la page de la dernière version. Téléchargez le nouvel `.exe`, quittez Butaca (menu → Quitter) et remplacez l'ancien fichier. Vos paramètres sont conservés. Comparez la version affichée dans *À propos* avec celle de la page des Releases.
+
+**Désinstaller :** décochez *Démarrer avec Windows* dans les paramètres, quittez Butaca et supprimez l'`.exe`. Pour ne laisser aucune trace, supprimez aussi le dossier `%APPDATA%\Butaca\` et, si vous avez enregistré un mot de passe Kodi, l'entrée `kodi-password.Butaca` dans le *Gestionnaire d'informations d'identification* de Windows.
+
 ## Comment l'affiche est choisie
 
 1. L'illustration que Kodi possède déjà, si c'est une URL `https` publique.
@@ -93,7 +102,7 @@ Discord ne peut pas afficher les chemins locaux ni les illustrations `smb://` ; 
 
 ## Confidentialité et sécurité
 
-- Butaca communique avec : votre Kodi (HTTP sur votre réseau local), Discord (IPC local sur votre PC) et, **uniquement si vous renseignez une clé**, TMDb.
+- Butaca communique avec : votre Kodi (HTTP et WebSocket sur votre réseau local), Discord (IPC local sur votre PC) et, **uniquement si vous renseignez une clé**, TMDb.
 - Ce que vous regardez est publié sur votre profil Discord, comme le veut le principe du Rich Presence. Utilisez *Mettre la présence en pause* dans le menu de la zone de notification pour l'arrêter.
 - Le mot de passe de Kodi est stocké dans le Gestionnaire d'informations d'identification de Windows. La clé TMDb est enregistrée en clair dans `config.json` ; c'est une clé gratuite liée à votre propre compte.
 - L'authentification HTTP de Kodi circule non chiffrée sur votre réseau. Gardez le contrôle à distance de Kodi dans votre réseau domestique et ne l'exposez jamais sur Internet.
@@ -125,7 +134,7 @@ L'exécutable est `target\release\butaca.exe`. `cargo test` lance les tests unit
 
 ## Feuille de route
 
-- Mises à jour instantanées via les notifications WebSocket de Kodi (port 9090), avec le sondage en secours.
+- Télécharger et installer les mises à jour depuis l'application.
 
 ## Mentions légales
 
