@@ -145,6 +145,10 @@ The executable is `target\release\butaca.exe`. Run `cargo test` for the unit tes
 
 - Download and install updates from within the app.
 
+## Support Butaca
+
+Butaca is free and open source. If you find it useful and want to support its maintenance and new features, you can do so through [GitHub Sponsors](https://github.com/sponsors/Alexxlml) or [Ko-fi](https://ko-fi.com/alexxlml). Starring the repository and reporting bugs helps a lot too.
+
 ## Legal
 
 Kodi® is a registered trademark of the XBMC Foundation. Discord is a trademark of Discord Inc. This project is not affiliated with, endorsed by, or sponsored by either.
